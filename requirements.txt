@@ -1,0 +1,7 @@
+cffi==2.0.0
+cryptography==46.0.3
+dotenv==0.9.9
+oracledb==3.4.1
+pycparser==2.23
+python-dotenv==1.2.1
+typing-extensions==4.15.0
