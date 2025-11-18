@@ -269,7 +269,7 @@ def delete_all(connection: oracledb.Connection):
     try:
         cursor.execute("DROP TABLE bookings_services")
         cursor.execute("DROP TABLE payments")
-        cursor.execute("DROP TABLE room_type")
+        cursor.execute("DROP TABLE room_types")
         cursor.execute("DROP TABLE rooms")
         cursor.execute("DROP TABLE bookings")
         cursor.execute("DROP TABLE positions")
@@ -358,11 +358,11 @@ PRIMARY KEY (position));
 email VARCHAR2(255),
 phone_num VARCHAR2(255),
 first_name VARCHAR2(255) NOT NULL,
-last_name VARCHAR2(255) NOT NULL);""")
+last_name VARCHAR2(255) NOT NULL)""")
 
         cursor.execute("""CREATE TABLE services (id INTEGER PRIMARY KEY,
 service_type VARCHAR2(255) NOT NULL,
-price NUMBER NOT NULL);""")
+price NUMBER NOT NULL)""")
 
         cursor.execute("""CREATE TABLE staff (id INTEGER PRIMARY KEY,
 first_name VARCHAR2(255) NOT NULL,
@@ -375,7 +375,7 @@ pay_type VARCHAR2(20) CHECK (pay_type IN ('HOURLY',
 'ANNUALLY')),
 staff_pay NUMBER NOT NULL,
 status VARCHAR2(20) CHECK(status in ('ACTIVE', 'INACTIVE'))
-NOT NULL, service_id INTEGER REFERENCES services(id));""")
+NOT NULL, service_id INTEGER REFERENCES services(id))""")
 
         cursor.execute("""CREATE TABLE bookings (id INTEGER PRIMARY KEY,
 check_in_date DATE NOT NULL,
@@ -384,14 +384,13 @@ status VARCHAR2(20) DEFAULT 'ONGOING'
 CHECK(status in ('ONGOING', 'CANCELLED',
 'CHECKED_OUT')),
 guest_id INTEGER NOT NULL REFERENCES guests(id),
-staff_id INTEGER NOT NULL REFERENCES staff(id));""")
+staff_id INTEGER NOT NULL REFERENCES staff(id))""")
 
         cursor.execute("""CREATE TABLE rooms (id INTEGER PRIMARY KEY,
 floor_num INTEGER NOT NULL,
 room_type VARCHAR2(20) DEFAULT 'REGULAR'
 CHECK(room_type in ('REGULAR', 'SUITE')),
-room_price NUMBER NOT NULL,
-booking_id INTEGER REFERENCES bookings(id));""")
+booking_id INTEGER REFERENCES bookings(id))""")
 
         cursor.execute("""CREATE TABLE payments (id INTEGER PRIMARY KEY,
 booking_id INTEGER NOT NULL REFERENCES
@@ -400,21 +399,22 @@ amount NUMERIC(6,2) NOT NULL,
 payment_date DATE,
 payment_method VARCHAR2(20) DEFAULT 'NONE'
 CHECK(payment_method IN ('CASH', 'CREDIT',
-'BANK_TRANSFER', 'NONE')));""")
+'BANK_TRANSFER', 'NONE')))""")
 
         cursor.execute("""CREATE TABLE bookings_services (id INTEGER PRIMARY KEY,
 booking_id INTEGER NOT NULL REFERENCES
 bookings(id),
 service_id INTEGER NOT NULL REFERENCES
-services(id));""")
+services(id))""")
 
-        cursor.execute("""CREATE TABLE room_type (room_type VARCHAR2(20) NOT NULL,
+        cursor.execute("""CREATE TABLE room_types (room_type VARCHAR2(20) NOT NULL,
 room_price NUMBER NOT NULL,
-PRIMARY KEY (room_type));""")
+PRIMARY KEY (room_type))""")
 
-        cursor.execute("""CREATE TABLE positions (dept VARCHAR2(20) NOT NULL,
+        cursor.execute("""CREATE TABLE positions (position VARCHAR2(40) NOT NULL,
+staff_dept VARCHAR2(30) NOT NULL,
 pay_type VARCHAR2(20) NOT NULL,
-PRIMARY KEY (dept));""")
+PRIMARY KEY (position))""")
 
         connection.commit()
         print("Tables created successfully")
@@ -433,103 +433,8 @@ def populate(connection: oracledb.Connection):
 
     Args:
         connection: Oracle database connection
-
-INSERT INTO guests (id, email, phone_num, first_name, last_name) VALUES (1,
-'rousseau@gmail.com', '123-456', 'Jean-Jacques', 'Rousseau');
-INSERT INTO guests (id, email, phone_num, first_name, last_name) VALUES (2,
-'fdostoevsky@gmail.com', '456-789', 'Fyodor', 'Dostoevsky');
-INSERT INTO guests (id, email, phone_num, first_name, last_name) VALUES (3,
-'alexandre.dumas@gmail.com', '789-123', 'Alexandre', 'Dumas');
-INSERT INTO guests (id, email, phone_num, first_name, last_name) VALUES (4,
-'julius.caesar@gmail.com', '135-790', 'Julius', 'Caesar');
-INSERT INTO guests (id, email, phone_num, first_name, last_name) VALUES (5,
-'shakespeare@gmail.com', '246-802', 'William', 'Shakespeare');
-
-INSERT INTO services (id, service_type, price) VALUES (1, 'Room Service', 25.00);
-INSERT INTO services (id, service_type, price) VALUES (2, 'Spa Treatment', 120.00);
-INSERT INTO services (id, service_type, price) VALUES (3, 'Laundry Service', 15.00);
-INSERT INTO services (id, service_type, price) VALUES(4, 'Airport Shuttle', 35.00);
-INSERT INTO services (id, service_type, price) VALUES(5, 'Breakfast Buffet', 18.00);
-INSERT INTO services (id, service_type, price) VALUES(6, 'Valet Parking', 20.00);
-INSERT INTO services (id, service_type, price) VALUES(7, 'Gym Access', 10.00);
-
-INSERT INTO staff (id, first_name, last_name, email, staff_dept, position, pay_type,
-staff_pay, status, service_id)
-VALUES (1, 'Caesar', 'Augustus', 'caesar.augustus@hotel.com', 'RECEPTION', 'Hotel
-Manager', 'ANNUALLY', 200000, 'ACTIVE', NULL);
-
-INSERT INTO staff (id, first_name, last_name, email, staff_dept, position, pay_type,
-staff_pay, status, service_id)
-VALUES (2, 'Marcus', 'Cicero', 'marcus.cicero@hotel.com', 'RECEPTION',
-'Receptionist', 'HOURLY', 21.50, 'ACTIVE', NULL);
-INSERT INTO staff (id, first_name, last_name, email, staff_dept, position, pay_type,
-staff_pay, status, service_id)
-VALUES (3, 'Haruki', 'Murakami', 'haruki.murakami@hotel.com', 'HOUSEKEEPING',
-'Housekeeping Supervisor', 'ANNUALLY', 37000, 'ACTIVE', 1);
-INSERT INTO staff (id, first_name, last_name, email, staff_dept, position, pay_type,
-staff_pay, status, service_id)
-VALUES (4, 'Leo', 'Tolstoy', 'leo.tolstoy@hotel.com', 'KITCHEN', 'Head Chef',
-'ANNUALLY', 75000, 'ACTIVE', 5);
-
-INSERT INTO rooms (id, floor_num, room_type, room_price, booking_id) VALUES
-(101, 1, 'REGULAR', 120.00, NULL);
-INSERT INTO rooms (id, floor_num, room_type, room_price, booking_id) VALUES
-(102, 1, 'REGULAR', 120.00, NULL);
-INSERT INTO rooms (id, floor_num, room_type, room_price, booking_id) VALUES
-(103, 1, 'SUITE', 250.00, NULL);
-INSERT INTO rooms (id, floor_num, room_type, room_price, booking_id) VALUES
-(201, 2, 'REGULAR', 140.00, NULL);
-INSERT INTO rooms (id, floor_num, room_type, room_price, booking_id) VALUES
-(202, 2, 'REGULAR', 140.00, NULL);
-INSERT INTO rooms (id, floor_num, room_type, room_price, booking_id) VALUES
-(203, 2, 'SUITE', 280.00, NULL);
-INSERT INTO rooms (id, floor_num, room_type, room_price, booking_id) VALUES
-(301, 3, 'REGULAR', 160.00, NULL);
-INSERT INTO rooms (id, floor_num, room_type, room_price, booking_id) VALUES
-(302, 3, 'REGULAR', 160.00, NULL);
-INSERT INTO rooms (id, floor_num, room_type, room_price, booking_id) VALUES
-(303, 3, 'SUITE', 320.00, NULL);
-INSERT INTO rooms (id, floor_num, room_type, room_price, booking_id) VALUES
-(401, 4, 'SUITE', 350.00, NULL);
-
-INSERT INTO bookings (id, check_in_date, check_out_date, status, guest_id, staff_id)
-VALUES
-(1, DATE '2025-09-16', NULL, 'ONGOING', 1, 1);
-
-INSERT INTO bookings (id, check_in_date, check_out_date, status, guest_id, staff_id)
-VALUES
-(2, DATE '2025-08-20', DATE '2025-08-22', 'CHECKED_OUT', 2, 2);
-INSERT INTO bookings (id, check_in_date, check_out_date, status, guest_id, staff_id)
-VALUES
-(4, DATE '2025-09-10', DATE '2025-09-15', 'CHECKED_OUT', 3, 3);
-INSERT INTO bookings (id, check_in_date, check_out_date, status, guest_id, staff_id)
-VALUES
-(8, DATE '2025-09-20', NULL, 'ONGOING', 4, 4);
-
-INSERT INTO payments (id, booking_id, amount, payment_date, payment_method)
-VALUES
-(1, 1, 2100.00, DATE '2025-09-17', 'BANK_TRANSFER');
-INSERT INTO payments (id, booking_id, amount, payment_date, payment_method)
-VALUES
-(2, 2, 600.00, DATE '2025-08-21', 'CASH');
-INSERT INTO payments (id, booking_id, amount, payment_date, payment_method)
-VALUES
-(3, 4, 1500.00, DATE '2025-09-14', 'CREDIT');
-INSERT INTO payments (id, booking_id, amount, payment_date, payment_method)
-VALUES
-(4, 8, 900.00, DATE '2024-09-20', 'BANK_TRANSFER');
-
-UPDATE rooms SET booking_id = 1 WHERE id = 302;
-UPDATE rooms SET booking_id = 8 WHERE id = 401;
-
-INSERT INTO bookings_services (id, booking_id, service_id) VALUES
-(1, 2, 1);
-INSERT INTO bookings_services (id, booking_id, service_id) VALUES
-(2, 4, 3);
-INSERT INTO bookings_services (id, booking_id, service_id) VALUES
-(3, 8, 6);
-
     """
+    print("Populating database with sample data...")
     cursor = connection.cursor()
     try:
         cursor.execute("INSERT INTO guests (id, email, phone_num, first_name, last_name) VALUES (1, 'rousseau@gmail.com', '123-456', 'Jean-Jacques', 'Rousseau')")
@@ -545,8 +450,8 @@ INSERT INTO bookings_services (id, booking_id, service_id) VALUES
         cursor.execute("INSERT INTO services (id, service_type, price) VALUES (6, 'Valet Parking', 20.00)")
         cursor.execute("INSERT INTO services (id, service_type, price) VALUES (7, 'Gym Access', 10.00)")
 
-        cursor.execute("INSERT INTO room_type (room_type, room_price) VALUES ('REGULAR', 120.00)")
-        cursor.execute("INSERT INTO room_type (room_type, room_price) VALUES ('SUITE', 250.00)")
+        cursor.execute("INSERT INTO room_types (room_type, room_price) VALUES ('REGULAR', 120.00)")
+        cursor.execute("INSERT INTO room_types (room_type, room_price) VALUES ('SUITE', 250.00)")
         
         cursor.execute("INSERT INTO positions (position, staff_dept, pay_type) VALUES ('Hotel Manager', 'RECEPTION', 'ANNUALLY')")
         cursor.execute("INSERT INTO positions (position, staff_dept, pay_type) VALUES ('Receptionist', 'RECEPTION', 'HOURLY')")
@@ -590,7 +495,10 @@ INSERT INTO bookings_services (id, booking_id, service_id) VALUES
     except oracledb.Error as e:
         connection.rollback()
         (error,) = e.args
-
+        print(f"Error populating database: {error.message}")
+        raise
+    finally:
+        cursor.close()
 
 def q1(connection: oracledb.Connection):
     """

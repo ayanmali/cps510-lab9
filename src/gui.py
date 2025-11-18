@@ -16,20 +16,20 @@ def start_gui(conn: oracledb.Connection):
 def create_widgets(root, conn: oracledb.Connection):
     frame = tk.Frame(root)
     frame.pack(pady=10)
-    tk.Label(frame, text="Query 1").grid(row=0, column=0, padx=10, pady=10)
-    tk.Button(frame, text="Execute", command=lambda: execute_query(conn, 1)).grid(row=0, column=1, padx=10, pady=10) # type: ignore
-    tk.Label(frame, text="Query 2").grid(row=1, column=0, padx=10, pady=10)
-    tk.Button(frame, text="Execute", command=lambda: execute_query(conn, 2)).grid(row=1, column=1, padx=10, pady=10) # type: ignore
-    tk.Label(frame, text="Query 3").grid(row=2, column=0, padx=10, pady=10)
-    tk.Button(frame, text="Execute", command=lambda: execute_query(conn, 3)).grid(row=2, column=1, padx=10, pady=10) # type: ignore
-    tk.Label(frame, text="Query 4").grid(row=3, column=0, padx=10, pady=10)
-    tk.Button(frame, text="Execute", command=lambda: execute_query(conn, 4)).grid(row=3, column=1, padx=10, pady=10) # type: ignore # type: ignore          
+    # tk.Label(frame, text="Query 1").grid(row=0, column=0, padx=10, pady=10)
+    # tk.Button(frame, text="Execute", command=lambda: execute_query(conn, 1)).grid(row=0, column=1, padx=10, pady=10) # type: ignore
+    # tk.Label(frame, text="Query 2").grid(row=1, column=0, padx=10, pady=10)
+    # tk.Button(frame, text="Execute", command=lambda: execute_query(conn, 2)).grid(row=1, column=1, padx=10, pady=10) # type: ignore
+    # tk.Label(frame, text="Query 3").grid(row=2, column=0, padx=10, pady=10)
+    # tk.Button(frame, text="Execute", command=lambda: execute_query(conn, 3)).grid(row=2, column=1, padx=10, pady=10) # type: ignore
+    # tk.Label(frame, text="Query 4").grid(row=3, column=0, padx=10, pady=10)
+    # tk.Button(frame, text="Execute", command=lambda: execute_query(conn, 4)).grid(row=3, column=1, padx=10, pady=10) # type: ignore # type: ignore          
 
-    tk.Label(frame, text="Query 5").grid(row=4, column=0, padx=10, pady=10)
-    tk.Button(frame, text="Execute", command=lambda: execute_query(conn, 5)).grid(row=4, column=1, padx=10, pady=10) # type: ignore # type: ignore      
+    # tk.Label(frame, text="Query 5").grid(row=4, column=0, padx=10, pady=10)
+    # tk.Button(frame, text="Execute", command=lambda: execute_query(conn, 5)).grid(row=4, column=1, padx=10, pady=10) # type: ignore # type: ignore      
 
-    # Separator
-    tk.Label(frame, text="─" * 30).grid(row=5, column=0, columnspan=2, pady=10)
+    # # Separator
+    # tk.Label(frame, text="─" * 30).grid(row=5, column=0, columnspan=2, pady=10)
     
     # Database management buttons
     tk.Label(frame, text="Database Management", font=("Arial", 10, "bold")).grid(row=6, column=0, columnspan=2, pady=5)
@@ -84,6 +84,7 @@ def handle_create_tables(conn: oracledb.Connection):
 def handle_populate(conn: oracledb.Connection):
     """Handle populating tables with sample data."""
     try:
+        print("GUI - Populating database with sample data...")
         populate(conn)
         messagebox.showinfo("Success", "Tables populated with sample data successfully!")
     except Exception as e:
