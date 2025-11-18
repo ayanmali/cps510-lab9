@@ -1,3 +1,4 @@
+from src.gui import start_gui
 from src.db import connect_to_oracle, execute_select
 from dotenv import load_dotenv
 import os
@@ -15,14 +16,14 @@ def main():
     try:
         conn = connect_to_oracle(username, password, dsn, oracle_client_lib_dir)
         print("Connected to Oracle database")
-        results = execute_select(conn, "SELECT * FROM guests")
-        print(results)
-        conn.close()
     except Exception as e:
         print(f"Error connecting to Oracle database: {e}")
         if conn:
             conn.close()
         exit(1)
+    
+    start_gui(conn)
+    conn.close()
 
 if __name__ == "__main__":
     main()
